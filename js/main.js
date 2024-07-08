@@ -120,18 +120,23 @@ function editTodo(id) {
     console.log(findTodo);
 }
 
-function updateTodo(id){
+function updateTodo(id) {
     const findTodo = todoArr.find(item => item.id == id)
-    if(findTodo){
-        findTodo.title = document.getElementById('editTodoInput').value
-        renderTodos(todoArr, todosCon);
-        updateTodosLenght()
-        wrapperModal.classList.remove("!top-0")
+    if (findTodo) {
+        if (document.getElementById('editTodoInput').value == "") {
+            alert("please fill teh input")
+        } else {
+            findTodo.title = document.getElementById('editTodoInput').value
+            renderTodos(todoArr, todosCon);
+            updateTodosLenght()
+            wrapperModal.classList.remove("!top-0")
+        }
+
     }
 }
 
 wrapperModal.addEventListener('click', (e) => {
-    if(e.target.id == "wrapperModal"){
+    if (e.target.id == "wrapperModal") {
         wrapperModal.classList.remove("!top-0")
     }
 })
