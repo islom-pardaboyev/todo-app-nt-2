@@ -12,7 +12,7 @@ const showUncompletedTodosLength = document.querySelector(".showUncompletedTodos
 const showDeletedTodosLength = document.querySelector(".showDeletedTodosLength");
 const wrapperModal = document.querySelector("#wrapperModal");
 const elChooseInput = document.querySelector(".choose-input");
-const elChooseIng = document.querySelector(".choose-img");
+const elChoosenImg = document.querySelector(".choose-img");
 
 let todoArr = JSON.parse(localStorage.getItem('todos')) || [];
 let deletedTodoArr = JSON.parse(localStorage.getItem('deletedTodos')) || [];
@@ -22,9 +22,9 @@ showDeletedTodos.addEventListener("click", () => handleFilterTodos(deletedTodoAr
 showAllTodos.addEventListener("click", () => handleFilterTodos(todoArr.filter(todo => todo), "Not yet Todos"));
 showCompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => todo.completed), 'Not yet completed todos'));
 showUncompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => !todo.completed), 'Not yet uncompleted todos'));
-form.addEventListener("submit", handleFormSubmit);
-elChooseInput.addEventListener('change', handleFileChange);
-wrapperModal.addEventListener('click', handleModalClick);
+form.addEventListener("submit", submitForm);
+elChooseInput.addEventListener('change', fileChange);
+wrapperModal.addEventListener('click', modal);
 
 function handleFilterTodos(arr, emptyMessage) {
     if (arr.length === 0) {
@@ -34,11 +34,11 @@ function handleFilterTodos(arr, emptyMessage) {
     }
 }
 
-function handleFormSubmit(e) {
+function submitForm(e) {
     e.preventDefault();
     const todoValue = e.target[0].value.trim();
 
-    if (todoValue) {
+    if (todoValue && todoValue.value == "") {
         const todoObj = {
             id: Date.now(),
             title: todoValue,
@@ -50,7 +50,7 @@ function handleFormSubmit(e) {
             todoArr.push(todoObj);
             saveTodos();
             e.target.reset();
-            elChooseIng.src = '/images/choose.png';
+            elChoosenImg.src = '/images/choose.png';
             renderTodos(todoArr, todosCon);
             updateTodosLength();
         } else {
@@ -61,18 +61,18 @@ function handleFormSubmit(e) {
     }
 }
 
-function handleFileChange(e) {
+function fileChange(e) {
     const file = e.target.files[0];
     if (file) {
         choosenImg = URL.createObjectURL(file);
-        elChooseIng.src = choosenImg;
+        elChoosenImg.src = choosenImg;
     } else {
         choosenImg = null;
-        elChooseIng.src = '/images/choose.png';
+        elChoosenImg.src = '/images/choose.png';
     }
 }
 
-function handleModalClick(e) {
+function modal(e) {
     if (e.target.id === "wrapperModal") {
         wrapperModal.classList.remove("!top-0");
     }
@@ -136,7 +136,7 @@ function editTodo(id) {
                 </div>
             </div>
         `;
-        document.getElementById('imgg').addEventListener('change', handleFileChange);
+        document.getElementById('imgg').addEventListener('change', fileChange);
     }
 }
 
