@@ -46,10 +46,6 @@ form.addEventListener("submit", e => {
 
     const todoValue = e.target[0].value.trim();
 
-    if(!todoValue){
-        alert("Please fill the input")
-    }
-
     const todoObj = {
         id: todoArr.length,
         title: todoValue,
