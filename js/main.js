@@ -37,8 +37,7 @@ function handleFilterTodos(arr, emptyMessage) {
 function submitForm(e) {
     e.preventDefault();
     const todoValue = e.target[0].value.trim();
-
-    if (todoValue || todoValue.value == "") {
+    if (todoValue) {
         const todoObj = {
             id: Date.now(),
             title: todoValue,
@@ -102,7 +101,6 @@ function renderTodos(arr, list) {
             updateTodosLength();
         });
 
-        console.log((todo.id));
         list.append(li);
     });
 }
