@@ -10,7 +10,7 @@ let showUncompletedTodosLength = document.querySelector(".showUncompletedTodosLe
 let showDeletedTodosLength = document.querySelector(".showDeletedTodosLength");
 let wrapperModal = document.querySelector("#wrapperModal");
 
-let todoArr = JSON.parse(localStorage.getItem('todos')) || [];
+let todoArr = JSON.parse(localStorage.getItem('todos'));
 let deletedTodoArr = JSON.parse(localStorage.getItem('deletedTodos')) || [];
 
 showDeletedTodos.addEventListener("click", () => {
@@ -45,6 +45,10 @@ form.addEventListener("submit", e => {
     e.preventDefault();
 
     const todoValue = e.target[0].value.trim();
+
+    if(!todoValue){
+        alert("Please fill the input")
+    }
 
     const todoObj = {
         id: todoArr.length,
