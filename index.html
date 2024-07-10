@@ -32,14 +32,20 @@
     <main>
         <div class="bg-white p-5 mt-8 rounded-xl">
             <h1 class="font-bold text-3xl">Welcome Todo</h1>
-            <form class="flex items-center mt-3 gap-3">
+            <form class="flex items-center gap-3">
                 <div class="flex border border-black rounded-md p-2 gap-3 items-center">
                     <i class="fa-solid fa-list-ul"></i>
                     <input type="text" class="outline-none w-[400px] font-medium" placeholder="Enter todo">
                 </div>
-                <button
-                    class="px-5 py-2.5 bg-sky-500/50 text-white duration-300 hover:bg-sky-500 rounded-md">Add</button>
+                <button type="submit" class="px-5 py-2.5 bg-sky-500/50 text-white duration-300 hover:bg-sky-500 rounded-md">
+                    Add
+                </button>
+                <label class="py-5 pl-3 inline-block">
+                    <input class="choose-input hidden" type="file">
+                    <img width="100" height="100" src="/images/choose.png" class="choose-img" alt="">
+                </label>
             </form>
+
             <div class="flex items-center justify-between my-4">
                 <button id="showAllTodos" class="bg-sky-500 text-white font-medium px-4 py-2 rounded-md">All (<span
                         class="showAllTodosLength">0</span>)</button>
@@ -51,6 +57,7 @@
                 <button id="showDeletedTodos" class="bg-sky-500 text-white font-medium px-4 py-2 rounded-md">Deleted
                     (<span class="showDeletedTodosLength">0</span>)</button>
             </div>
+
         </div>
 
         <ul id="todosCon" class="w-full flex flex-col gap-4 p-5 bg-white mt-10 rounded-xl">
@@ -61,7 +68,6 @@
     <div class="fixed w-full h-full top-[100%] duration-300 left-0 backdrop-blur-md bg-black/50" id="wrapperModal">
 
     </div>
-
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

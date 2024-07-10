@@ -1,72 +1,87 @@
-let form = document.querySelector("form");
-let todosCon = document.querySelector("#todosCon");
-let showAllTodos = document.querySelector("#showAllTodos");
-let showCompletedTodos = document.querySelector("#showCompletedTodos");
-let showUncompletedTodos = document.querySelector("#showUncompletedTodos");
-let showDeletedTodos = document.querySelector("#showDeletedTodos");
-let showAllTodosLength = document.querySelector(".showAllTodosLength");
-let showCompletedTodosLength = document.querySelector(".showCompletedTodosLength");
-let showUncompletedTodosLength = document.querySelector(".showUncompletedTodosLength");
-let showDeletedTodosLength = document.querySelector(".showDeletedTodosLength");
-let wrapperModal = document.querySelector("#wrapperModal");
+"use strict";
 
-let todoArr = JSON.parse(localStorage.getItem('todos'));
+const form = document.querySelector("form");
+const todosCon = document.querySelector("#todosCon");
+const showAllTodos = document.querySelector("#showAllTodos");
+const showCompletedTodos = document.querySelector("#showCompletedTodos");
+const showUncompletedTodos = document.querySelector("#showUncompletedTodos");
+const showDeletedTodos = document.querySelector("#showDeletedTodos");
+const showAllTodosLength = document.querySelector(".showAllTodosLength");
+const showCompletedTodosLength = document.querySelector(".showCompletedTodosLength");
+const showUncompletedTodosLength = document.querySelector(".showUncompletedTodosLength");
+const showDeletedTodosLength = document.querySelector(".showDeletedTodosLength");
+const wrapperModal = document.querySelector("#wrapperModal");
+const elChooseInput = document.querySelector(".choose-input");
+const elChooseIng = document.querySelector(".choose-img");
+
+let todoArr = JSON.parse(localStorage.getItem('todos')) || [];
 let deletedTodoArr = JSON.parse(localStorage.getItem('deletedTodos')) || [];
+let choosenImg = null;
 
-showDeletedTodos.addEventListener("click", () => {
-    if (deletedTodoArr.length == 0) {
-        todosCon.innerHTML = '<h1 class="font-bold text-center text-gray-500">Not yet deleted todos</h1>';
+showDeletedTodos.addEventListener("click", () => handleFilterTodos(deletedTodoArr, 'Not yet deleted todos'));
+showAllTodos.addEventListener("click", () => handleFilterTodos(todoArr.filter(todo => todo), "Not yet Todos"));
+showCompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => todo.completed), 'Not yet completed todos'));
+showUncompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => !todo.completed), 'Not yet uncompleted todos'));
+form.addEventListener("submit", handleFormSubmit);
+elChooseInput.addEventListener('change', handleFileChange);
+wrapperModal.addEventListener('click', handleModalClick);
+
+function handleFilterTodos(arr, emptyMessage) {
+    if (arr.length === 0) {
+        todosCon.innerHTML = `<h1 class="font-bold text-center text-gray-500">${emptyMessage}</h1>`;
     } else {
-        renderTodos(deletedTodoArr, todosCon);
+        renderTodos(arr, todosCon);
     }
-});
+}
 
-showAllTodos.addEventListener("click", () => {
-    renderTodos(todoArr, todosCon);
-});
-
-showCompletedTodos.addEventListener('click', () => {
-    if (todoArr.filter(todo => todo.completed).length == 0) {
-        todosCon.innerHTML = '<h1 class="font-bold text-center text-gray-500">Not yet completed todos</h1>';
-    } else {
-        renderTodos(todoArr.filter(todo => todo.completed), todosCon);
-    }
-});
-
-showUncompletedTodos.addEventListener('click', () => {
-    if (todoArr.filter(todo => !todo.completed).length == 0) {
-        todosCon.innerHTML = '<h1 class="font-bold text-center text-gray-500">Not yet uncompleted todos</h1>';
-    } else {
-        renderTodos(todoArr.filter(todo => !todo.completed), todosCon);
-    }
-});
-
-form.addEventListener("submit", e => {
+function handleFormSubmit(e) {
     e.preventDefault();
-
     const todoValue = e.target[0].value.trim();
 
-    const todoObj = {
-        id: todoArr.length,
-        title: todoValue,
-        completed: false
-    };
-    const existingTodo = todoArr.find((item) => item.title == todoObj.title);
-    if (!existingTodo) {
-        todoArr.push(todoObj);
-        saveTodos();
+    if (todoValue) {
+        const todoObj = {
+            id: Date.now(),
+            title: todoValue,
+            imgUrl: choosenImg,
+            completed: false
+        };
+
+        if (!todoArr.some(item => item.title === todoObj.title)) {
+            todoArr.push(todoObj);
+            saveTodos();
+            e.target.reset();
+            elChooseIng.src = '/images/choose.png';
+            renderTodos(todoArr, todosCon);
+            updateTodosLength();
+        } else {
+            alert("This Todo already exists");
+        }
     } else {
-        alert("This Todo already exists");
+        alert("Todo cannot be empty");
     }
-    e.target.reset();
-    renderTodos(todoArr, todosCon);
-    updateTodosLength();
-});
+}
+
+function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+        choosenImg = URL.createObjectURL(file);
+        elChooseIng.src = choosenImg;
+    } else {
+        choosenImg = null;
+        elChooseIng.src = '/images/choose.png';
+    }
+}
+
+function handleModalClick(e) {
+    if (e.target.id === "wrapperModal") {
+        wrapperModal.classList.remove("!top-0");
+    }
+}
 
 function renderTodos(arr, list) {
     list.innerHTML = "";
     arr.forEach((todo, index) => {
-        let li = document.createElement("li");
+        const li = document.createElement("li");
         li.className = "flex p-2 rounded-md border border-black items-center justify-between";
         li.innerHTML = `
             <div class="flex items-center">
@@ -75,15 +90,16 @@ function renderTodos(arr, list) {
                 <label class="cursor-pointer ${todo.completed ? "line-through text-gray-500" : ""} select-none text-xl font-bold ml-3">${todo.title}</label>
             </div>
             <div class="flex items-center gap-3">
+                <img width="100" height="100" src="${todo.imgUrl || 'https://placehold.co/600x400/white/black/?text=Img+Not+Selected'}" alt="Image">
                 <i class="fa-regular p-2 rounded-md text-white cursor-pointer duration-300 hover:bg-green-500 font-bold bg-green-500/50 fa-pen-to-square" onclick="editTodo(${todo.id})"></i>
                 <i class="fa-regular p-2 rounded-md text-white cursor-pointer duration-300 hover:bg-red-500 font-bold bg-red-500/50 fa-square-minus" onclick="deleteTodo(${todo.id})"></i>
             </div>
         `;
         li.querySelector("input").addEventListener("click", () => {
             todo.completed = !todo.completed;
+            saveTodos();
             renderTodos(todoArr, todosCon);
             updateTodosLength();
-            saveTodos();
         });
         list.append(li);
     });
@@ -94,52 +110,54 @@ function deleteTodo(id) {
     if (todoToDelete) {
         deletedTodoArr.push(todoToDelete);
         todoArr = todoArr.filter(todo => todo.id !== id);
-        renderTodos(todoArr, todosCon);
-        console.log(deletedTodoArr);
         saveTodos();
+        renderTodos(todoArr, todosCon);
+        updateTodosLength();
     }
-    updateTodosLength();
 }
 
 function editTodo(id) {
-    wrapperModal.classList.add("!top-0");
-    const findTodo = todoArr.find(item => item.id == id);
-    wrapperModal.innerHTML = `
-                <div class="absolute top-[50%] left-[50%] w-[600px] h-[400px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
-            <div class="flex flex-col items-center justify-center p-5">
-                <h2 class="font-bold text-2xl">Edit Todo</h2>
-
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="editTodoInput" class="w-full text-black px-3 py-2 rounded-md" placeholder="Edit todo" value="${findTodo.title}">
-                    <button onclick="updateTodo(${id})" class="w-full px-3 py-2 mt-3 bg-clifford hover:bg-clifford/60 duration-300 text-white rounded-md">Save</button>
+    const findTodo = todoArr.find(item => item.id === id);
+    if (findTodo) {
+        wrapperModal.classList.add("!top-0");
+        wrapperModal.innerHTML = `
+            <div class="absolute top-[50%] left-[50%] w-[600px] h-[600px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
+                <div class="flex flex-col items-center justify-center p-5">
+                    <h2 class="font-bold text-2xl">Edit Todo</h2>
+                    <div class="flex flex-col gap-3 box-border">
+                        <input type="text" id="editTodoInput" class="w-full text-black px-3 py-2 rounded-md" placeholder="Edit todo" value="${findTodo.title}">
+                        <label class="py-5 pl-3 inline-block">
+                            <input class="hidden" id="imgg" type="file">
+                            <img src="${findTodo.imgUrl || '/images/choose.png'}" class="choose-img" alt="">
+                            <p>Click img for edit img and click save</p>
+                        </label>
+                        <button onclick="updateTodo(${id})" class="w-full px-3 py-2 mt-3 bg-clifford hover:bg-clifford/60 duration-300 text-white rounded-md">Save</button>
+                    </div>
                 </div>
-
             </div>
-        </div>
-    `;
-    console.log(findTodo);
+        `;
+        document.getElementById('imgg').addEventListener('change', handleFileChange);
+    }
 }
 
 function updateTodo(id) {
-    const findTodo = todoArr.find(item => item.id == id);
+    const findTodo = todoArr.find(item => item.id === id);
     if (findTodo) {
-        if (document.getElementById('editTodoInput').value == "") {
-            alert("Please fill the input");
-        } else {
-            findTodo.title = document.getElementById('editTodoInput').value;
+        const updatedTitle = document.getElementById('editTodoInput').value.trim();
+        if (updatedTitle) {
+            findTodo.title = updatedTitle;
+            if (choosenImg) {
+                findTodo.imgUrl = choosenImg;
+            }
+            saveTodos();
             renderTodos(todoArr, todosCon);
             updateTodosLength();
-            saveTodos();
             wrapperModal.classList.remove("!top-0");
+        } else {
+            alert("Please fill the input");
         }
     }
 }
-
-wrapperModal.addEventListener('click', (e) => {
-    if (e.target.id == "wrapperModal") {
-        wrapperModal.classList.remove("!top-0");
-    }
-});
 
 function updateTodosLength() {
     showAllTodosLength.textContent = todoArr.length;
@@ -149,10 +167,9 @@ function updateTodosLength() {
 }
 
 function saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(todoArr));
-    localStorage.setItem('deletedTodos', JSON.stringify(deletedTodoArr));
+    window.localStorage.setItem('todos', JSON.stringify(todoArr));
+    window.localStorage.setItem('deletedTodos', JSON.stringify(deletedTodoArr));
 }
 
-// Initial render
 renderTodos(todoArr, todosCon);
 updateTodosLength();
