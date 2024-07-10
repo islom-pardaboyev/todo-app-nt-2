@@ -16,14 +16,15 @@ const elChoosenImg = document.querySelector(".choose-img");
 
 let todoArr = JSON.parse(localStorage.getItem('todos')) || [];
 let deletedTodoArr = JSON.parse(localStorage.getItem('deletedTodos')) || [];
-let choosenImg = null;
+let choosenImgCreate = null;
+let choosenImgEdit = null;
 
-showDeletedTodos.addEventListener("click", () => handleFilterTodos(deletedTodoArr, 'Not yet deleted todos'));
-showAllTodos.addEventListener("click", () => handleFilterTodos(todoArr.filter(todo => todo), "Not yet Todos"));
-showCompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => todo.completed), 'Not yet completed todos'));
-showUncompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => !todo.completed), 'Not yet uncompleted todos'));
+showDeletedTodos.addEventListener("click", () => handleFilterTodos(deletedTodoArr, 'No deleted todos yet'));
+showAllTodos.addEventListener("click", () => handleFilterTodos(todoArr, "No todos yet"));
+showCompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => todo.completed), 'No completed todos yet'));
+showUncompletedTodos.addEventListener('click', () => handleFilterTodos(todoArr.filter(todo => !todo.completed), 'No uncompleted todos yet'));
 form.addEventListener("submit", submitForm);
-elChooseInput.addEventListener('change', fileChange);
+elChooseInput.addEventListener('change', fileChangeCreate);
 wrapperModal.addEventListener('click', modal);
 
 function handleFilterTodos(arr, emptyMessage) {
@@ -41,7 +42,7 @@ function submitForm(e) {
         const todoObj = {
             id: Date.now(),
             title: todoValue,
-            imgUrl: choosenImg,
+            imgUrl: choosenImgCreate,
             completed: false
         };
 
@@ -49,6 +50,7 @@ function submitForm(e) {
             todoArr.push(todoObj);
             saveTodos();
             e.target.reset();
+            choosenImgCreate = null;
             elChoosenImg.src = '/images/choose.png';
             renderTodos(todoArr, todosCon);
             updateTodosLength();
@@ -60,13 +62,13 @@ function submitForm(e) {
     }
 }
 
-function fileChange(e) {
+function fileChangeCreate(e) {
     const file = e.target.files[0];
     if (file) {
-        choosenImg = URL.createObjectURL(file);
-        elChoosenImg.src = choosenImg;
+        choosenImgCreate = URL.createObjectURL(file);
+        elChoosenImg.src = choosenImgCreate;
     } else {
-        choosenImg = null;
+        choosenImgCreate = null;
         elChoosenImg.src = '/images/choose.png';
     }
 }
@@ -85,8 +87,8 @@ function renderTodos(arr, list) {
         li.innerHTML = `
             <div class="flex items-center">
                 <p class="font-semibold text-gray-500 text-lg">${index + 1}</p>
-                <input type="checkbox" ${todo.completed ? "checked" : ""} class="ml-2 scale-125 font-medium">
-                <label class="cursor-pointer ${todo.completed ? "line-through text-gray-500" : ""} select-none text-xl font-bold ml-3">${todo.title}</label>
+                <input id="title-${todo.id}" type="checkbox" ${todo.completed ? "checked" : ""} class="ml-2 scale-125 font-medium">
+                <label for="title-${todo.id}" class="cursor-pointer ${todo.completed ? "line-through text-gray-500" : ""} select-none text-xl font-bold ml-3">${todo.title}</label>
             </div>
             <div class="flex items-center gap-3">
                 <img width="100" height="100" src="${todo.imgUrl || 'https://placehold.co/600x400/white/black/?text=Img+Not+Selected&font=raleway'}" alt="Image">
@@ -119,6 +121,7 @@ function deleteTodo(id) {
 function editTodo(id) {
     const findTodo = todoArr.find(item => item.id === id);
     if (findTodo) {
+        choosenImgEdit = findTodo.imgUrl;
         wrapperModal.classList.add("!top-0");
         wrapperModal.innerHTML = `
             <div class="absolute top-[50%] left-[50%] w-[600px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
@@ -138,7 +141,15 @@ function editTodo(id) {
                 </div>
             </div>
         `;
-        document.getElementById('imgg').addEventListener('change', fileChange);
+        document.getElementById('imgg').addEventListener('change', fileChangeEdit);
+    }
+}
+
+function fileChangeEdit(e) {
+    const file = e.target.files[0];
+    if (file) {
+        choosenImgEdit = URL.createObjectURL(file);
+        document.querySelector(".choose-img").src = "/images/choose.png";
     }
 }
 
@@ -148,13 +159,14 @@ function updateTodo(id) {
         const updatedTitle = document.getElementById('editTodoInput').value.trim();
         if (updatedTitle) {
             findTodo.title = updatedTitle;
-            if (choosenImg) {
-                findTodo.imgUrl = choosenImg;
+            if (choosenImgEdit) {
+                findTodo.imgUrl = choosenImgEdit;
             }
             saveTodos();
             renderTodos(todoArr, todosCon);
             updateTodosLength();
             wrapperModal.classList.remove("!top-0");
+            choosenImgEdit = null; // Reset the choosenImgEdit after update
         } else {
             alert("Please fill the input");
         }
