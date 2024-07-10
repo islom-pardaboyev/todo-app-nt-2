@@ -101,6 +101,8 @@ function renderTodos(arr, list) {
             renderTodos(todoArr, todosCon);
             updateTodosLength();
         });
+
+        console.log((todo.id));
         list.append(li);
     });
 }
@@ -124,12 +126,14 @@ function editTodo(id) {
             <div class="absolute top-[50%] left-[50%] w-[600px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
                 <div class="flex flex-col items-center justify-center p-5">
                     <h2 class="font-bold text-2xl">Edit Todo</h2>
-                    <div class="flex flex-col gap-3 box-border">
+                    <div class="flex flex-col gap-5 box-border">
                         <input type="text" id="editTodoInput" class="w-full text-black px-3 py-2 rounded-md" placeholder="Edit todo" value="${findTodo.title}">
-                        <label class="py-5 pl-3 inline-block">
+                        <label class="relative group overflow-hidden cursor-pointer">
                             <input class="hidden" id="imgg" type="file">
-                            <img src="${findTodo.imgUrl || '/images/choose.png'}" class="choose-img" alt="">
-                            <p>Click img for edit img and click save</p>
+                            <img src="${findTodo.imgUrl || '/images/choose.png'}" class="choose-img w-[500px] h-full" alt="">
+                            <div class="absolute top-[100%] group-hover:top-0 duration-300 left-0 bg-black/80 w-full h-full">
+                            <h1 class="flex items-center justify-center min-h-full text-white font-bold">Click here for edit img <br> and click save button</h1>
+                            </div>
                         </label>
                         <button onclick="updateTodo(${id})" class="w-full px-3 py-2 mt-3 bg-clifford hover:bg-clifford/60 duration-300 text-white rounded-md">Save</button>
                     </div>
