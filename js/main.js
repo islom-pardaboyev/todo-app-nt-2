@@ -90,7 +90,7 @@ function renderTodos(arr, list) {
                 <label class="cursor-pointer ${todo.completed ? "line-through text-gray-500" : ""} select-none text-xl font-bold ml-3">${todo.title}</label>
             </div>
             <div class="flex items-center gap-3">
-                <img width="100" height="100" src="${todo.imgUrl || 'https://placehold.co/600x400/white/black/?text=Img+Not+Selected'}" alt="Image">
+                <img width="100" height="100" src="${todo.imgUrl || 'https://placehold.co/600x400/white/black/?text=Img+Not+Selected&font=raleway'}" alt="Image">
                 <i class="fa-regular p-2 rounded-md text-white cursor-pointer duration-300 hover:bg-green-500 font-bold bg-green-500/50 fa-pen-to-square" onclick="editTodo(${todo.id})"></i>
                 <i class="fa-regular p-2 rounded-md text-white cursor-pointer duration-300 hover:bg-red-500 font-bold bg-red-500/50 fa-square-minus" onclick="deleteTodo(${todo.id})"></i>
             </div>
@@ -121,7 +121,7 @@ function editTodo(id) {
     if (findTodo) {
         wrapperModal.classList.add("!top-0");
         wrapperModal.innerHTML = `
-            <div class="absolute top-[50%] left-[50%] w-[600px] h-[600px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
+            <div class="absolute top-[50%] left-[50%] w-[600px] bg-pink-400 text-white translate-x-[-50%] translate-y-[-50%]">
                 <div class="flex flex-col items-center justify-center p-5">
                     <h2 class="font-bold text-2xl">Edit Todo</h2>
                     <div class="flex flex-col gap-3 box-border">
