@@ -38,7 +38,7 @@ function submitForm(e) {
     e.preventDefault();
     const todoValue = e.target[0].value.trim();
 
-    if (todoValue && todoValue.value == "") {
+    if (todoValue || todoValue.value == "") {
         const todoObj = {
             id: Date.now(),
             title: todoValue,
