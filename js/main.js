@@ -166,7 +166,7 @@ function updateTodo(id) {
             renderTodos(todoArr, todosCon);
             updateTodosLength();
             wrapperModal.classList.remove("!top-0");
-            choosenImgEdit = null; // Reset the choosenImgEdit after update
+            choosenImgEdit = null;
         } else {
             alert("Please fill the input");
         }
